@@ -34,7 +34,6 @@ namespace Client
                 byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
                 int bytesRead = serverStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                 Console.WriteLine("Server : " + Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
-                //serverStream.Flush();
             }
         }
     }
