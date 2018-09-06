@@ -13,9 +13,9 @@ namespace Server
         public static TcpListener serverSocket;
         public static TcpClient clientSocket;
         public static NetworkStream networkStream;
-        public static List<string> clientQuestions = new List<string>() { "hi", "im Yaroslav", "can i ask you?", "when did World War 2 start?", "do you know a lot of things?" };
-        public static List<string> serverAnswers = new List<string>() { "Hi!", "Nice to meet you! Im BetaServer#01.", "Yes of course...", "On September 1, 1939", "I know many more things" };
 
+        public static Dictionary<string, string> questionsAnswers = new Dictionary<string, string>() { };
+        public static List<string> names = new List<string>() { "Shura", "Elfi", "Donny", "Vladi", "Serush", "Jora", "Dmutku", "Stasik", "Huy", "Anonim" };
 
         static void Main(string[] args)
         {
@@ -26,15 +26,16 @@ namespace Server
             Console.WriteLine("Server started!");
             clientSocket = serverSocket.AcceptTcpClient();
             Console.WriteLine("Connection complete. Client has been connected!");
-            networkStream = clientSocket.GetStream();
+
             GetDataFromClientAndSendAnswer();
         }
 
-        static private void GetDataFromClientAndSendAnswer()
+        private static void GetDataFromClientAndSendAnswer()
         {
-            while (true)
+            using (networkStream = clientSocket.GetStream())
             {
-                try
+                AddQuestionsAnswers();
+                while (true)
                 {
                     byte[] byteFrom = new byte[clientSocket.ReceiveBufferSize];
                     if (networkStream.DataAvailable)
@@ -44,39 +45,60 @@ namespace Server
                         dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("\0"));
                         Console.WriteLine("Client : " + dataFromClient);
 
-                        for (int i = 0; i < clientQuestions.Count; i++)
+                        string[] questions = questionsAnswers.Keys.ToArray();
+                        foreach (KeyValuePair<string, string> item in questionsAnswers)
                         {
-                            if (dataFromClient == clientQuestions[i])
+                            if (dataFromClient == item.Key && dataFromClient != questions[0])
                             {
-                                string answer = serverAnswers[i];
-                                byte[] bytesOfAnswer = Encoding.ASCII.GetBytes(answer);
-                                int answerLenghtInBytes = bytesOfAnswer.Length;
-                                Console.WriteLine("Sending back : " + answer);
-                                networkStream.Write(bytesOfAnswer, 0, answerLenghtInBytes);
+                                string result = item.Value;
+                                ReturnAnswer(result);
                             }
                         }
 
-                        if (dataFromClient != clientQuestions[0] && dataFromClient != clientQuestions[1] && dataFromClient != clientQuestions[2]
-                            && dataFromClient != clientQuestions[3] && dataFromClient != clientQuestions[4])
+                        for (int j = 0; j < names.Count; j++)
                         {
-                            ReturnDefaultAnswer();
+                            if (dataFromClient == questions[0] + names[j])
+                            {
+                                string toRemove = "my name is ";
+                                string result = string.Empty;
+                                int k = dataFromClient.IndexOf(toRemove);
+                                if (k >= 0)
+                                {
+                                    result = dataFromClient.Remove(k, toRemove.Length);
+                                }
+                                ReturnAnswer(result);
+                            }
+                        }
+
+                        if (dataFromClient != questions[0] + names[0] && dataFromClient != questions[0] + names[1] && dataFromClient != questions[0] + names[2]
+                            && dataFromClient != questions[0] + names[3] && dataFromClient != questions[0] + names[4] && dataFromClient != questions[0] + names[5]
+                            && dataFromClient != questions[0] + names[6] && dataFromClient != questions[0] + names[7] && dataFromClient != questions[0] + names[8]
+                            && dataFromClient != questions[0] + names[9] && dataFromClient != questions[1] && dataFromClient != questions[2] && dataFromClient != questions[3]
+                            && dataFromClient != questions[4])
+                        {
+                            string result = "I dont know";
+                            ReturnAnswer(result);
                         }
                     }
-                }
-                catch (Exception exeption)
-                {
-                    Console.WriteLine(exeption.ToString());
                 }
             }
         }
 
-        public static void ReturnDefaultAnswer()
+        public static void ReturnAnswer(string answerX)
         {
-            string defaultAnswer = "I dont know";
-            byte[] bytesOfDefaultAnswer = Encoding.ASCII.GetBytes(defaultAnswer);
-            int defaultAnswerLenghtInBytes = bytesOfDefaultAnswer.Length;
-            Console.WriteLine("Sending back : " + defaultAnswer);
-            networkStream.Write(bytesOfDefaultAnswer, 0, defaultAnswerLenghtInBytes);
+            byte[] bytesOfAnswerX = Encoding.ASCII.GetBytes(answerX);
+            int answerXBytesLenght = bytesOfAnswerX.Length;
+            Console.WriteLine("Sending back : " + answerX);
+            networkStream.Write(bytesOfAnswerX, 0, answerXBytesLenght);
+        }
+
+        public static void AddQuestionsAnswers()
+        {
+            questionsAnswers.Add("hi, my name is ", "Hi! Nice to meet you! Im BetaServer#01.");
+            questionsAnswers.Add("can i ask you?", "Yes of course...");
+            questionsAnswers.Add("when did World War 1 start?", "On July 28, 1914");
+            questionsAnswers.Add("when did World War 2 start?", "On September 1, 1939");
+            questionsAnswers.Add("do you know a lot of things?", "I know many more things");
         }
     }
 }
