@@ -70,7 +70,7 @@ namespace Server
                             }
                         }
 
-                        if (!dataFromClient.Contains(questionsAnswers.Keys.ToString()) && dataFromClient != questions[0] + names[1] && dataFromClient != questions[0] + names[2]
+                        if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + names[0] && dataFromClient != questions[0] + names[1] && dataFromClient != questions[0] + names[2]
                             && dataFromClient != questions[0] + names[3] && dataFromClient != questions[0] + names[4] && dataFromClient != questions[0] + names[5]
                             && dataFromClient != questions[0] + names[6] && dataFromClient != questions[0] + names[7] && dataFromClient != questions[0] + names[8]
                             && dataFromClient != questions[0] + names[9] && dataFromClient != questions[1] && dataFromClient != questions[2] && dataFromClient != questions[3]
