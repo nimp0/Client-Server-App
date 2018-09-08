@@ -14,8 +14,8 @@ namespace Server
         public static TcpClient clientSocket;
         public static NetworkStream networkStream;
 
-        public static Dictionary<string, string> questionsAnswers = new Dictionary<string, string>() { };
-        public static List<string> names = new List<string>() { "Shura", "Elfi", "Donny", "Vladi", "Serush", "Jora", "Dmutku", "Stasik", "Huy", "Anonim" };
+        public static Dictionary<string, string> questionsAnswers = new Dictionary<string, string>();
+        public static List<string> names = new List<string>() { " Shura ", " Elfi ", " Donny ", " Vladi ", " Serush ", " Jora ", " Dmutku ", " Stasik ", " Huyan ", " Anonim " };
 
         static void Main(string[] args)
         {
@@ -48,18 +48,18 @@ namespace Server
                         string[] questions = questionsAnswers.Keys.ToArray();
                         foreach (KeyValuePair<string, string> item in questionsAnswers)
                         {
-                            if (dataFromClient == item.Key && dataFromClient != questions[0])
+                            if (dataFromClient == item.Key)
                             {
                                 string result = item.Value;
                                 ReturnAnswer(result);
                             }
                         }
 
-                        for (int j = 0; j < names.Count; j++)
+                        for (int i = 0; i < names.Count; i++)
                         {
-                            if (dataFromClient == questions[0] + names[j])
+                            if (dataFromClient == questions[0] + names[i])
                             {
-                                string toRemove = "my name is ";
+                                string toRemove = "my name is";
                                 string result = string.Empty;
                                 int k = dataFromClient.IndexOf(toRemove);
                                 if (k >= 0)
@@ -70,15 +70,16 @@ namespace Server
                             }
                         }
 
-                        if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + names[0] && dataFromClient != questions[0] + names[1] && dataFromClient != questions[0] + names[2]
-                            && dataFromClient != questions[0] + names[3] && dataFromClient != questions[0] + names[4] && dataFromClient != questions[0] + names[5]
-                            && dataFromClient != questions[0] + names[6] && dataFromClient != questions[0] + names[7] && dataFromClient != questions[0] + names[8]
-                            && dataFromClient != questions[0] + names[9] && dataFromClient != questions[1] && dataFromClient != questions[2] && dataFromClient != questions[3]
-                            && dataFromClient != questions[4])
+                        if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + names[0] && dataFromClient != questions[0] + names[1]
+                        && dataFromClient != questions[0] + names[2] && dataFromClient != questions[0] + names[3] && dataFromClient != questions[0] + names[4]
+                        && dataFromClient != questions[0] + names[5] && dataFromClient != questions[0] + names[6] && dataFromClient != questions[0] + names[7]
+                        && dataFromClient != questions[0] + names[8] && dataFromClient != questions[0] + names[9])
                         {
                             string result = "I dont know";
                             ReturnAnswer(result);
                         }
+
+
                     }
                 }
             }
@@ -94,7 +95,7 @@ namespace Server
 
         public static void AddQuestionsAnswers()
         {
-            questionsAnswers.Add("hi, my name is ", "Hi! Nice to meet you! Im BetaServer#01.");
+            questionsAnswers.Add("hi, my name is", "Hi! Nice to meet you! Im BetaServer#01.");
             questionsAnswers.Add("can i ask you?", "Yes of course...");
             questionsAnswers.Add("when did World War 1 start?", "On July 28, 1914");
             questionsAnswers.Add("when did World War 2 start?", "On September 1, 1939");
