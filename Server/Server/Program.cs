@@ -15,7 +15,7 @@ namespace Server
         public static NetworkStream networkStream;
 
         public static Dictionary<string, string> questionsAnswers = new Dictionary<string, string>();
-        public static List<string> names = new List<string>() { " Shura ", " Elfi ", " Donny ", " Vladi ", " Serush ", " Jora ", " Dmutku ", " Stasik ", " Huyan ", " Anonim " };
+        public static List<string> names = new List<string>() { " Shura", " Elfi", " Donny", " Vladi", " Serush", " Jora", " Dmutku", " Stasik", " Huyan", " Anonim" };
 
         static void Main(string[] args)
         {
@@ -55,7 +55,36 @@ namespace Server
                             }
                         }
 
-                        for (int i = 0; i < names.Count; i++)
+                        
+
+                        IEnumerable<string> namesX = from name in names where name.Any() select name;
+                        foreach (string name in namesX)
+                        {
+                            if (dataFromClient == questions[0] + name)
+                            {
+                                string toRemove = "my name is";
+                                string result = string.Empty;
+                                int k = dataFromClient.IndexOf(toRemove);
+                                if (k >= 0)
+                                {
+                                    result = dataFromClient.Remove(k, toRemove.Length);
+                                }
+                                ReturnAnswer(result);
+                            }
+
+                            if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != name)
+                            {
+                                string result = "I dont know";
+                                ReturnAnswer(result);
+                            }
+
+                            /* if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + name)
+                             {
+                                 string result = "I dont know";
+                                 ReturnAnswer(result);
+                             }*/
+                        }
+                        /*for (int i = 0; i < names.Count; i++)
                         {
                             if (dataFromClient == questions[0] + names[i])
                             {
@@ -70,14 +99,17 @@ namespace Server
                             }
                         }
 
-                        if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + names[0] && dataFromClient != questions[0] + names[1]
-                        && dataFromClient != questions[0] + names[2] && dataFromClient != questions[0] + names[3] && dataFromClient != questions[0] + names[4]
-                        && dataFromClient != questions[0] + names[5] && dataFromClient != questions[0] + names[6] && dataFromClient != questions[0] + names[7]
-                        && dataFromClient != questions[0] + names[8] && dataFromClient != questions[0] + names[9])
+                        if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + names[i])
                         {
-                            string result = "I dont know";
-                            ReturnAnswer(result);
-                        }
+                            IEnumerable<string> namesX = from name in names where name.Any() select name;
+                            foreach (string name in namesX)
+                            {
+                                string result = "I dont know";
+                                ReturnAnswer(result);
+                            }
+                        }*/
+
+
 
 
                     }
