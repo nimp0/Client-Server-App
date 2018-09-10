@@ -33,7 +33,6 @@ namespace Server
             Console.WriteLine("Server started!");
             clientSocket = serverSocket.AcceptTcpClient();
             Console.WriteLine("Connection complete. Client has been connected!");
-
             GetDataFromClientAndSendAnswer();
         }
 
@@ -58,17 +57,17 @@ namespace Server
                         dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("\0"));
                         Console.WriteLine("Client : " + dataFromClient);
 
-                        bool predicate(string ans)
+                        bool predicate(string neededKey)
                         {
-                            bool res = dataFromClient.Contains(ans);
+                            bool res = answerKeysToSearch.Any(key => dataFromClient.Contains(neededKey));
                             return res;
-                        };
+                        }
 
                         string answerKey = answerKeysToSearch.Where(predicate).FirstOrDefault();
                         if (answerKey == null)
                         {
-                            string result = "I dont know";
-                            ReturnAnswer(result);
+                            string defaultAnswer = "I dont know";
+                            ReturnAnswer(defaultAnswer);
                             continue;
                         }
 
