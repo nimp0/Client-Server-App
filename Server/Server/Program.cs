@@ -15,7 +15,14 @@ namespace Server
         public static NetworkStream networkStream;
 
         public static Dictionary<string, string> questionsAnswers = new Dictionary<string, string>();
-        public static List<string> names = new List<string>() { " Shura", " Elfi", " Donny", " Vladi", " Serush", " Jora", " Dmutku", " Stasik", " Huyan", " Anonim" };
+        /*public static List<string> names = new List<string>()
+        {
+            " Shura", " Elfi", " Donny", " Vladi",
+            " Serush", " Jora", " Dmutku", " Stasik",
+            " Huyan", " Anonim"
+        };*/
+
+        public const string MyNameIsKey = "hi, my name is";
 
         static void Main(string[] args)
         {
@@ -35,6 +42,12 @@ namespace Server
             using (networkStream = clientSocket.GetStream())
             {
                 AddQuestionsAnswers();
+                List<string> answerKeysToSearch = new List<string>();
+
+                foreach (var key in questionsAnswers.Keys)
+                {
+                    answerKeysToSearch.Add(key);
+                }
                 while (true)
                 {
                     byte[] byteFrom = new byte[clientSocket.ReceiveBufferSize];
@@ -45,73 +58,28 @@ namespace Server
                         dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("\0"));
                         Console.WriteLine("Client : " + dataFromClient);
 
-                        string[] questions = questionsAnswers.Keys.ToArray();
-                        foreach (KeyValuePair<string, string> item in questionsAnswers)
+                        bool predicate(string ans)
                         {
-                            if (dataFromClient == item.Key)
-                            {
-                                string result = item.Value;
-                                ReturnAnswer(result);
-                            }
+                            bool res = dataFromClient.Contains(ans);
+                            return res;
+                        };
+
+                        string answerKey = answerKeysToSearch.Where(predicate).FirstOrDefault();
+                        if (answerKey == null)
+                        {
+                            string result = "I dont know";
+                            ReturnAnswer(result);
+                            continue;
                         }
 
-                        
-
-                        IEnumerable<string> namesX = from name in names where name.Any() select name;
-                        foreach (string name in namesX)
+                        string answer = questionsAnswers[answerKey];
+                        if (answerKey == MyNameIsKey)
                         {
-                            if (dataFromClient == questions[0] + name)
-                            {
-                                string toRemove = "my name is";
-                                string result = string.Empty;
-                                int k = dataFromClient.IndexOf(toRemove);
-                                if (k >= 0)
-                                {
-                                    result = dataFromClient.Remove(k, toRemove.Length);
-                                }
-                                ReturnAnswer(result);
-                            }
-
-                            if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != name)
-                            {
-                                string result = "I dont know";
-                                ReturnAnswer(result);
-                            }
-
-                            /* if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + name)
-                             {
-                                 string result = "I dont know";
-                                 ReturnAnswer(result);
-                             }*/
+                            int startIndex = dataFromClient.IndexOf(MyNameIsKey);
+                            string textThatIsNotPartOfKey = dataFromClient.Substring(startIndex + MyNameIsKey.Length);
+                            answer = string.Format(answer, textThatIsNotPartOfKey);
                         }
-                        /*for (int i = 0; i < names.Count; i++)
-                        {
-                            if (dataFromClient == questions[0] + names[i])
-                            {
-                                string toRemove = "my name is";
-                                string result = string.Empty;
-                                int k = dataFromClient.IndexOf(toRemove);
-                                if (k >= 0)
-                                {
-                                    result = dataFromClient.Remove(k, toRemove.Length);
-                                }
-                                ReturnAnswer(result);
-                            }
-                        }
-
-                        if (!questionsAnswers.ContainsKey(dataFromClient) && dataFromClient != questions[0] + names[i])
-                        {
-                            IEnumerable<string> namesX = from name in names where name.Any() select name;
-                            foreach (string name in namesX)
-                            {
-                                string result = "I dont know";
-                                ReturnAnswer(result);
-                            }
-                        }*/
-
-
-
-
+                        ReturnAnswer(answer);
                     }
                 }
             }
@@ -127,7 +95,7 @@ namespace Server
 
         public static void AddQuestionsAnswers()
         {
-            questionsAnswers.Add("hi, my name is", "Hi! Nice to meet you! Im BetaServer#01.");
+            questionsAnswers.Add(MyNameIsKey, "Hi {0}! Nice to meet you! Im BetaServer#01.");
             questionsAnswers.Add("can i ask you?", "Yes of course...");
             questionsAnswers.Add("when did World War 1 start?", "On July 28, 1914");
             questionsAnswers.Add("when did World War 2 start?", "On September 1, 1939");
